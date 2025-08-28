@@ -1,3 +1,5 @@
+// src/pages/TodoPage.js
+
 import React, { useState, useEffect } from "react";
 import TodoForm from "../../components/TodoForm.js";
 import TodoList from "../../components/TodoList.js";
@@ -75,6 +77,25 @@ const TodoPage = () => {
       .catch((err) => console.error("Error updating todo:", err));
   };
 
+  // BARU: Fungsi untuk menangani pembaruan teks tugas
+  const handleUpdateTodo = (id, newTask) => {
+    fetch(`/api/todos/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ task: newTask }), // Kirim teks tugas yang baru
+    })
+      .then(() => {
+        setTodos(
+          todos.map((todo) =>
+            todo.id === id ? { ...todo, task: newTask } : todo
+          )
+        );
+      })
+      .catch((err) => console.error("Error updating task:", err));
+  };
+
   if (loading) {
     return <div style={{ textAlign: "center" }}>Loading...</div>;
   }
@@ -102,6 +123,7 @@ const TodoPage = () => {
           todos={todos}
           onToggleCompleted={handleToggleCompleted}
           onDeleteTodo={handleDeleteTodo}
+          onUpdateTodo={handleUpdateTodo} // BARU: Teruskan fungsi update sebagai props
         />
       </header>
     </div>

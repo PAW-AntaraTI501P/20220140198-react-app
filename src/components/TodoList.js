@@ -1,7 +1,10 @@
+// src/components/TodoList.js
+
 import React from "react";
 import TodoItem from "./TodoItem";
 
-const TodoList = ({ todos, onToggleCompleted, onDeleteTodo }) => {
+// DIUBAH: Terima props onUpdateTodo
+const TodoList = ({ todos, onToggleCompleted, onDeleteTodo, onUpdateTodo }) => {
   if (todos.length === 0) {
     return <p>Tidak ada tugas yang ditemukan. Silakan tambahkan satu.</p>;
   }
@@ -14,6 +17,7 @@ const TodoList = ({ todos, onToggleCompleted, onDeleteTodo }) => {
           todo={todo}
           onToggleCompleted={onToggleCompleted}
           onDeleteTodo={onDeleteTodo}
+          onUpdateTodo={onUpdateTodo} // DIUBAH: Teruskan props ke TodoItem
         />
       ))}
     </ul>
