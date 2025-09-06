@@ -1,13 +1,13 @@
-// src/pages/TodoPage.js
-
 import React, { useState, useEffect } from "react";
 import TodoForm from "../../components/TodoForm.js";
 import TodoList from "../../components/TodoList.js";
+import SearchInput from "../../components/SearchInput.js";
 
 const TodoPage = () => {
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // 🔍 state pencarian
 
   const fetchTodos = () => {
     fetch("/api/todos")
@@ -34,25 +34,18 @@ const TodoPage = () => {
   const handleAddTodo = (task) => {
     fetch("/api/todos", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ task }),
     })
       .then((response) => response.json())
       .then((data) => {
-        setTodos([
-          ...todos,
-          { id: data.id, task: data.task, completed: false },
-        ]);
+        setTodos([...todos, { id: data.id, task: data.task, completed: false }]);
       })
       .catch((err) => console.error("Error adding todo:", err));
   };
 
   const handleDeleteTodo = (id) => {
-    fetch(`/api/todos/${id}`, {
-      method: "DELETE",
-    })
+    fetch(`/api/todos/${id}`, { method: "DELETE" })
       .then(() => {
         setTodos(todos.filter((todo) => todo.id !== id));
       })
@@ -62,9 +55,7 @@ const TodoPage = () => {
   const handleToggleCompleted = (id, completed) => {
     fetch(`/api/todos/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ completed: !completed }),
     })
       .then(() => {
@@ -77,14 +68,11 @@ const TodoPage = () => {
       .catch((err) => console.error("Error updating todo:", err));
   };
 
-  // BARU: Fungsi untuk menangani pembaruan teks tugas
   const handleUpdateTodo = (id, newTask) => {
     fetch(`/api/todos/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ task: newTask }), // Kirim teks tugas yang baru
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task: newTask }),
     })
       .then(() => {
         setTodos(
@@ -101,10 +89,13 @@ const TodoPage = () => {
   }
 
   if (error) {
-    return (
-      <div style={{ textAlign: "center", color: "red" }}>Error: {error}</div>
-    );
+    return <div style={{ textAlign: "center", color: "red" }}>Error: {error}</div>;
   }
+
+  // 🔍 filter todos sesuai pencarian
+  const filteredTodos = todos.filter((todo) =>
+    todo.task.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div
@@ -118,12 +109,13 @@ const TodoPage = () => {
       <header style={{ textAlign: "center" }}>
         <h1>Aplikasi Todo List</h1>
         <TodoForm onAddTodo={handleAddTodo} />
+        <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> {/* ✅ dipakai */}
         <h2>Daftar Tugas Anda</h2>
         <TodoList
-          todos={todos}
+          todos={filteredTodos} // ✅ pakai hasil filter
           onToggleCompleted={handleToggleCompleted}
           onDeleteTodo={handleDeleteTodo}
-          onUpdateTodo={handleUpdateTodo} // BARU: Teruskan fungsi update sebagai props
+          onUpdateTodo={handleUpdateTodo}
         />
       </header>
     </div>
